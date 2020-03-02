@@ -30,7 +30,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'mapquiz.apps.MapquizConfig',
-    'django.contrib.gis',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -75,7 +74,7 @@ WSGI_APPLICATION = 'Schnitzeljagd.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
@@ -115,7 +114,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
-# Hack to find the gdal library: https://stackoverflow.com/a/49776371
-GDAL_LIBRARY_PATH = r'C:\OSGeo4W64\bin\gdal204'
-os.chdir(os.path.dirname(GDAL_LIBRARY_PATH))

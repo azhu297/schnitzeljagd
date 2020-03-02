@@ -1,4 +1,3 @@
-from django.contrib.gis.db import models as geomodels
 from django.core.validators import ValidationError
 from django.db import models
 
@@ -64,7 +63,8 @@ class Location(Resource):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, blank=True, null=True)
     hint = models.TextField(max_length=1_000)  # Providing hint to find this location
     found_text = models.TextField(max_length=1_000)  # Success text, provided once this location has been found
-    point = geomodels.PointField("map location")
+    lat = models.FloatField("latitude", null=True)
+    lng = models.FloatField("longitude", null=True)
 
     def __str__(self):
         return self.hint
