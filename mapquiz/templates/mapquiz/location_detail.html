@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hints</title>
+</head>
+<body>
+
+<p>You solved:</p>
+<p>{{ object.hint }}</p>
+
+{% if final_stage %}
+    <h1>You have found the treasure!</h1>
+    <h1>{{ object.found_text }}</h1>
+{% else %}
+
+    <p>{{ object.found_text }}</p>
+
+    <p>Next Stage:</p>
+    <ul>
+        {% for hint in hints %}
+            <li>{{ hint }}</li>
+        {% endfor %}
+    </ul>
+
+{% endif %}
+
+<p> You are at: Lat: {{ object.lat }} | Lng: {{ object.lng }} </p>
+</body>
+</html>

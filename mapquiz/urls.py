@@ -1,3 +1,7 @@
+from django.urls import path
+
+from . import views
+
 app_name = 'mapquiz'
 # urlpatterns = [
 #     path('explanation/', views.Explanation.as_view(), name='explanation'),
@@ -6,4 +10,7 @@ app_name = 'mapquiz'
 #     path('location/<int:uri>/', views.Location.as_view(), name='location'),
 # ]
 
-urlpatterns = []
+urlpatterns = [
+    path('location/<slug:code>', views.LocationView.as_view(), name='location'),
+
+]
