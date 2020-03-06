@@ -60,7 +60,7 @@ class Quiz(Resource):
 
 
 class Location(Resource):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, blank=True, null=True)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     # Providing hint to find this location
     hint = models.TextField(max_length=1_000)
     # Success text, provided once this location has been found
