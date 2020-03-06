@@ -1,30 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Hints</title>
-</head>
-<body>
+{% extends "mapquiz/base.html" %}
+{% block title %} {{ object.name }} {% endblock %}
 
-<p>You solved:</p>
-<p>{{ object.hint }}</p>
+{% block body %}
+    <div class="container alert alert-success alert-dismissible fade show">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>You found:</h4>
+        <p>{{ object.hint }}</p>
+    </div>
 
-{% if final_stage %}
-    <h1>You have found the treasure!</h1>
-    <h1>{{ object.found_text }}</h1>
-{% else %}
+    {% if final_stage %}
+        <div class="jumbotron">
+            <h1>You have found the treasure!</h1>
+            <h1>{{ object.found_text }}</h1>
+        </div>
 
-    <p>{{ object.found_text }}</p>
+    {% else %}
+        <div class="container pb-lg-5 text-center">
+            <h class="display-4 ">{{ object.found_text }}</h>
+        </div>
+        <div class="container p-3 bg-primary text-white">
+            <h4>Next Quiz:</h4>
+            {% for hint in hints %}
+                <div class="container h5 p-3 border">{{ hint }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-    <p>Next Stage:</p>
-    <ul>
-        {% for hint in hints %}
-            <li>{{ hint }}</li>
-        {% endfor %}
-    </ul>
+    <div class="container p-5"></div>
 
-{% endif %}
-
-<p> You are at: Lat: {{ object.lat }} | Lng: {{ object.lng }} </p>
-</body>
-</html>
+    <p class="container-fluid-sm bg-info">
+        You are at: {{ object.name }} | Lat: {{ object.lat }} | Lng: {{ object.lng }}
+    </p>
+{% endblock %}
