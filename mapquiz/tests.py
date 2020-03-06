@@ -20,20 +20,14 @@ class UriTest(TestCase):
         v.code = "String"
         self.assertRaises(IntegrityError, v.save)
 
-    def test_qrcode(self):
+    def test_qr_code(self):
         from PIL import Image
         u = Uri()
         u.save()
-        self.assert_(Image.isImageType(u.generate_qrcode()))
+        self.assert_(Image.isImageType(u.qr_code()))
 
 
 class HuntTest(TestCase):
-    def test_unique_name(self):
-        h = Hunt(name="hunt")
-        h.save()
-        j = Hunt(name="hunt")
-        self.assertRaises(IntegrityError, j.save)
-
     def test_uri(self):
         """ Has a randomly generated unique resource identifier """
         h = Hunt(name="Hunt")

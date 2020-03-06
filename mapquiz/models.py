@@ -10,9 +10,6 @@ class Uri(models.Model):
     def __str__(self):
         return self.code
 
-    def generate_qrcode(self):
-        return generate_qrcode(self.code)
-
     def save(self):
         while self.code is None:
             code = generate_uri_code(32)
@@ -20,6 +17,10 @@ class Uri(models.Model):
                 self.code = code
 
         super(Uri, self).save()
+
+    def qr_code(self):
+        image = generate_qrcode(self.code)
+        return image
 
 
 def generate_uri():
@@ -29,27 +30,24 @@ def generate_uri():
 
 
 class Resource(models.Model):
-    """ Abstract base class for all models that have a uri """
+    """ Abstract base class for all models that have a uri and name"""
     uri = models.OneToOneField(Uri, on_delete=models.CASCADE, primary_key=True, default=generate_uri)
+    name = models.CharField(max_length=32)
+
+    def __str__(self):
+        return f"{self.name} [{str(self.uri)[:4]}]"
 
     class Meta:
         abstract = True
 
 
 class Hunt(Resource):
-    name = models.CharField(max_length=32, unique=True)
-
-    def __str__(self):
-        return self.name
+    pass
 
 
 class Quiz(Resource):
-    name = models.CharField(max_length=32, unique=True)
     hunt = models.ForeignKey(Hunt, on_delete=models.CASCADE)
     stage = models.IntegerField()
-
-    def __str__(self):
-        return self.name
 
     def save(self):
         same_stage = Quiz.objects.filter(hunt=self.hunt, stage=self.stage)
@@ -68,9 +66,6 @@ class Location(Resource):
     lat = models.FloatField("latitude", null=True, blank=True)
     lng = models.FloatField("longitude", null=True, blank=True)
 
-    def __str__(self):
-        return self.hint
-
 
 class Team(Resource):
     name = models.CharField(max_length=32, unique=True)
@@ -78,5 +73,3 @@ class Team(Resource):
     hunt = models.ForeignKey(Hunt, blank=True, null=True, on_delete=models.SET_NULL)
     last_location = models.ForeignKey(Location, default=None, blank=True, null=True, on_delete=models.SET_NULL)
 
-    def __str__(self):
-        return self.name
