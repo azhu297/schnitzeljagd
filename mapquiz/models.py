@@ -35,7 +35,7 @@ class Resource(models.Model):
     name = models.CharField(max_length=32)
 
     def __str__(self):
-        return f"{self.name} [{str(self.uri)[:4]}]"
+        return self.name
 
     class Meta:
         abstract = True
