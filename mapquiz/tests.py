@@ -24,7 +24,7 @@ class UriTest(TestCase):
         from PIL import Image
         u = Uri()
         u.save()
-        self.assert_(Image.isImageType(u.qr_code()))
+        self.assert_(Image.isImageType(u.qr_code("http://test")))
 
 
 class HuntTest(TestCase):
@@ -32,6 +32,19 @@ class HuntTest(TestCase):
         """ Has a randomly generated unique resource identifier """
         h = Hunt(name="Hunt")
         self.assert_(hasattr(h, "uri"))
+
+    def test_stages(self):
+        h = Hunt(name="Hunt")
+        h.save()
+        self.assertEquals(h.stages(), 0)
+
+        q = Quiz(name="Quiz 1", hunt=h, stage=1)
+        q.save()
+        self.assertEquals(h.stages(), 1)
+
+        q = Quiz(name="Quiz 2", hunt=h, stage=0)
+        q.save()
+        self.assertEquals(h.stages(), 2)
 
 
 class QuizTest(TestCase):

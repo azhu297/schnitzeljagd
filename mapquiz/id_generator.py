@@ -17,7 +17,7 @@ def generate_uri_code(max_length):
     return slugify(token)
 
 
-def generate_qrcode(string):
+def generate_qrcode(string: str) -> Image:
     qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_Q)
     qr.add_data(string)
     qr.make()

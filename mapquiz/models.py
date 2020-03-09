@@ -1,3 +1,5 @@
+from urllib.parse import urljoin
+
 from django.core.validators import ValidationError
 from django.db import models
 
@@ -18,8 +20,9 @@ class Uri(models.Model):
 
         super(Uri, self).save()
 
-    def qr_code(self):
-        image = generate_qrcode(self.code)
+    def qr_code(self, path):
+        text = urljoin(path, self.code)
+        image = generate_qrcode(text)
         return image
 
 
@@ -42,7 +45,10 @@ class Resource(models.Model):
 
 
 class Hunt(Resource):
-    pass
+    def stages(self) -> int:
+        """ Return number of stages in the Hunt """
+        quizzes = Quiz.objects.filter(hunt=self).all()
+        return len(quizzes)
 
 
 class Quiz(Resource):
@@ -55,6 +61,9 @@ class Quiz(Resource):
             raise ValidationError(f"Quiz '{self}' has same stage as: '{same_stage[0]}'")
 
         super(Quiz, self).save()
+
+    class Meta:
+        verbose_name_plural = "quizzes"
 
 
 class Location(Resource):
