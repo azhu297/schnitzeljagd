@@ -7,7 +7,7 @@ from .models import *
 
 
 class ResourceTemplate:
-    fields = ['name', 'code']
+    fields = ['uri', 'name', 'code']
     readonly_fields = ['code']
     list_display = ['name', 'code']
 
@@ -17,17 +17,22 @@ class ResourceTemplate:
 
 class LocationInline(ResourceTemplate, NestedTabularInline):
     model = Location
-    extra = 3
     fk_name = 'quiz'
     fields = ResourceTemplate.fields + ['hint', 'found_text', 'lat', 'lng']
 
     # https://stackoverflow.com/a/18738715
     formfield_overrides = {
         TextField: {'widget': Textarea(
-            attrs={'rows': 5,
-                   'cols': 25, }
+            attrs={'rows': 3,
+                   'cols': 40, }
         )}
     }
+
+    def get_extra(self, request, obj=None, **kwargs):
+        extra = 3
+        if obj:
+            return max(extra - obj.location_set.count(), 0)
+        return extra
 
 
 class QuizInline(ResourceTemplate, NestedStackedInline):
@@ -49,14 +54,17 @@ class HuntAdmin(ResourceTemplate, NestedModelAdmin):
 @admin.register(Quiz)
 class QuizAdmin(ResourceTemplate, NestedModelAdmin):
     inlines = [LocationInline]
-    fields = ResourceTemplate.fields + ['stage']
-    list_display = ResourceTemplate.list_display + ['name', 'code']
+    fields = ResourceTemplate.fields + ['hunt', 'stage']
+    list_display = ResourceTemplate.list_display + ['locations', 'code']
+
+    def locations(self, quiz: Quiz):
+        return quiz.location_set.count()
 
 
 @admin.register(Location)
 class LocationAdmin(ResourceTemplate, admin.ModelAdmin):
-    fields = ResourceTemplate.fields + ['hint', 'found_text', 'lat', 'lng']
-    list_display = ResourceTemplate.list_display + ['short_hint']
+    fields = ResourceTemplate.fields + ['quiz', 'hint', 'found_text', 'lat', 'lng']
+    list_display = ResourceTemplate.list_display + ['quiz', 'short_hint']
 
     def short_hint(self, loc: Location, max_length: int = 25) -> str:
         """ Short extract of a hint """

@@ -7,18 +7,10 @@ from .id_generator import *
 
 
 class Uri(models.Model):
-    code = models.SlugField(max_length=32, null=True, blank=True, unique=True, editable=False)
+    code = models.SlugField(max_length=32, unique=True, editable=False)
 
     def __str__(self):
         return self.code
-
-    def save(self):
-        while self.code is None:
-            code = generate_uri_code(32)
-            if not Uri.objects.filter(code=code).exists():
-                self.code = code
-
-        super(Uri, self).save()
 
     def qr_code(self, path):
         text = urljoin(path, self.code)
@@ -27,14 +19,19 @@ class Uri(models.Model):
 
 
 def generate_uri():
-    uri = Uri()
+    while True:
+        code = generate_uri_code(32)
+        if not Uri.objects.filter(code=code).exists():
+            break
+
+    uri = Uri(code=code)
     uri.save()
     return uri
 
 
 class Resource(models.Model):
     """ Abstract base class for all models that have a uri and name"""
-    uri = models.OneToOneField(Uri, on_delete=models.CASCADE, primary_key=True, default=generate_uri)
+    uri = models.OneToOneField(Uri, on_delete=models.CASCADE, blank=True, primary_key=True, default=generate_uri)
     name = models.CharField(max_length=32)
 
     def __str__(self):
@@ -47,20 +44,18 @@ class Resource(models.Model):
 class Hunt(Resource):
     def stages(self) -> int:
         """ Return number of stages in the Hunt """
-        quizzes = Quiz.objects.filter(hunt=self).all()
-        return len(quizzes)
+        return self.quiz_set.count()
 
 
 class Quiz(Resource):
     hunt = models.ForeignKey(Hunt, on_delete=models.CASCADE)
     stage = models.IntegerField()
 
-    def save(self):
-        same_stage = Quiz.objects.filter(hunt=self.hunt, stage=self.stage)
+    def save(self, *args, **kwargs):
+        same_stage = Quiz.objects.filter(hunt=self.hunt, stage=self.stage) \
+            .exclude(uri__code=self.uri.code)
         if same_stage.exists():
             raise ValidationError(f"Quiz '{self}' has same stage as: '{same_stage[0]}'")
-
-        super(Quiz, self).save()
 
     class Meta:
         verbose_name_plural = "quizzes"
