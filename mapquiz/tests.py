@@ -5,34 +5,32 @@ from django.urls import reverse
 from .models import *
 
 
-class UriTest(TestCase):
-    def test_uri_generate(self):
-        u = Uri()
-        u.save()
-        self.assertIsNotNone(u.code)
+class ResourceTest(TestCase):
+    def test_code_generate(self):
+        """" A random code is assigned to a resource """
+        r = Hunt(name="h")
+        r.save()
+        self.assertIsNotNone(r.code)
 
-    def test_uri_uniqueness(self):
-        u = Uri()
-        u.code = "String"
-        u.save()
+    def test_code_uniqueness(self):
+        """" A new code is generated while saving if it is not unique """
+        r = Hunt(name="h")
+        r.code = "String"
+        r.save()
 
-        v = Uri()
-        v.code = "String"
-        self.assertRaises(IntegrityError, v.save)
+        s = Hunt(name="h2")
+        s.code = "String"
+        s.save()
+        self.assertNotEqual(s.code, "String")
 
     def test_qr_code(self):
-        from PIL import Image
-        u = Uri()
-        u.save()
-        self.assert_(Image.isImageType(u.qr_code("http://test")))
+        """ QR codes are generated from the code """
+        r = Hunt(name="h")
+        r.save()
+        self.assert_(Image.isImageType(r.qr_code("http://test")))
 
 
 class HuntTest(TestCase):
-    def test_uri(self):
-        """ Has a randomly generated unique resource identifier """
-        h = Hunt(name="Hunt")
-        self.assert_(hasattr(h, "uri"))
-
     def test_stages(self):
         h = Hunt(name="Hunt")
         h.save()
@@ -81,7 +79,7 @@ class LocationViewTest(TestCase):
     def test_valid_location(self):
         """ Can reach a valid location by uri code"""
         loc = generate_location()
-        url = reverse('mapquiz:location', args=(loc.uri.code,))
+        url = reverse('mapquiz:location', args=(loc.code,))
         client = Client()
         response = client.get(url)
         self.assertEqual(response.status_code, 200)  # Valid Http Response
@@ -90,7 +88,7 @@ class LocationViewTest(TestCase):
         """ Cannot reach a missing url """
         # Get a non existing url by generating a new location but not saving it -> guaranteed missing url
         l = Location(quiz=generate_quiz(), hint="H", found_text="F")
-        url = reverse('mapquiz:location', args=(l.uri.code,))
+        url = reverse('mapquiz:location', args=(l.code,))
         client = Client()
         response = client.get(url)
         self.assertEqual(response.status_code, 404)  # Not found

@@ -7,12 +7,9 @@ from .models import *
 
 
 class ResourceTemplate:
-    fields = ['uri', 'name', 'code']
+    fields = ['name', 'code']
     readonly_fields = ['code']
     list_display = ['name', 'code']
-
-    def code(self, obj: Resource):
-        return obj.uri.code
 
 
 class LocationInline(ResourceTemplate, NestedTabularInline):

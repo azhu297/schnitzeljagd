@@ -4,30 +4,34 @@ from django.views import generic
 from .models import *
 
 
-class LocationView(generic.DetailView):
-    model = Location
-
+class ResourceDetailView(generic.DetailView):
     def get_object(self, queryset=None):
-        """ Overwrite to find object by code"""
+        """ Overwrite to find the resource by code """
         code = self.kwargs.get('code')
         if queryset is None:
             queryset = self.model.objects
 
-        return get_object_or_404(queryset, uri__code=code)
+        return get_object_or_404(queryset, code=code)
+
+
+class LocationView(ResourceDetailView):
+    model = Location
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         location = context['object']
+
+        # Try to get next quiz
         solved_stage = location.quiz.stage
         hunt = location.quiz.hunt
         try:
             next_quiz = hunt.quiz_set.get(stage=solved_stage + 1)
         except Quiz.DoesNotExist:
+            # Render page as final page without new hints
             context['final_stage'] = True
             return context
-        else:
-            context['final_stage'] = False
 
+        # Collect all the hints for the next quiz
         hints = []
         next_locations = next_quiz.location_set.all()
         for location in next_locations:
