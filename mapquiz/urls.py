@@ -12,5 +12,5 @@ app_name = 'mapquiz'
 
 urlpatterns = [
     path('location/<slug:code>', views.LocationView.as_view(), name='location'),
-
+    path('team/<slug:code>', views.TeamView.as_view(), name='team'),
 ]

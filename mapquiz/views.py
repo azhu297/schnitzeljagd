@@ -39,3 +39,33 @@ class LocationView(ResourceDetailView):
 
         context['hints'] = hints
         return context
+
+
+class TeamView(ResourceDetailView):
+    model = Team
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        team = context['object']
+        context['team_name'] = team.name
+
+        request = context['view'].request
+        session = request.session
+
+        team_cookie = session.get('team_id', None)
+        if team_cookie is None:
+            # # https://docs.djangoproject.com/en/3.0/topics/http/sessions/#setting-test-cookies
+            # if request.method == 'GET':
+            #     session.set_test_cookie()
+            #     context['test_cookie'] = True  # HTML has to set next request to POST
+            #     return context
+            # # Try to set cookie with Team code
+            # if not session.test_cookie_worked():
+            #     context['test_cookie_failed'] = True  # HTML asks user to enable cookies
+            #
+            # session.delete_test_cookie()
+            #
+            session['team_id'] = team.code
+            context['joining'] = True
+
+        return context
