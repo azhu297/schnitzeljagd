@@ -19,6 +19,12 @@ class LocationView(ResourceDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Check team access
+        team_id = context['view'].request.session.get('team_id', None)
+        if not team_id:
+            return context
+
+        context['team'] = Team.objects.get(code=team_id)
         location = context['object']
 
         # Try to get next quiz
@@ -40,6 +46,19 @@ class LocationView(ResourceDetailView):
         context['hints'] = hints
         return context
 
+    def render_to_response(self, context, **response_kwargs):
+        """ Render denied.html if the user does not have a team """
+        if 'team' not in context:
+            response_kwargs.setdefault('content_type', self.content_type)
+            return self.response_class(
+                request=self.request,
+                template=['mapquiz/denied.html'],
+                context=context,
+                using=self.template_engine,
+                **response_kwargs
+            )
+        return super().render_to_response(context, **response_kwargs)
+
 
 class TeamView(ResourceDetailView):
     model = Team
@@ -47,7 +66,7 @@ class TeamView(ResourceDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         team = context['object']
-        context['team_name'] = team.name
+        context['team'] = team  # For the team navbar, object == team for the team view
 
         request = context['view'].request
         session = request.session

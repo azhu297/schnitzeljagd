@@ -6,8 +6,8 @@
 {% block body %}
     <div class="container alert alert-success alert-dismissible fade show">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <h4>{% trans 'You are now at' %}:</h4>
-        <p>{{ object.hint }}</p>
+        <p><i>{{ object.hint }}</i></p>
+        <h4>{% trans 'You are now at' %}: <strong>{{ object.name }}</strong></h4>
     </div>
 
     {% if final_stage %}
@@ -20,11 +20,16 @@
         <div class="container pb-lg-5 text-center">
             <h class="display-4 ">{{ object.found_text }}</h>
         </div>
-        <div class="container p-3 bg-primary text-white">
-            <h4>{% trans 'Next Quiz' %}:</h4>
-            {% for hint in hints %}
-                <div class="container h5 p-3 border">{{ hint }}</div>
-            {% endfor %}
+
+        <div class="container">
+            <div class="card">
+                <div class="card-header bg-primary text-white"><h4>{% trans 'Next Quiz' %}</h4></div>
+                <div class="card-body">
+                    {% for hint in hints %}
+                        <div class="container h5 p-3 border-left border-primary">{{ hint }}</div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     {% endif %}
 

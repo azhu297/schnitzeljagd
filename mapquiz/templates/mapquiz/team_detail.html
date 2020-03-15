@@ -4,18 +4,19 @@
 {% block title %} {{ object.name }} {% endblock %}
 
 {% block body %}
-    <div class="jumbotron">
+    <div class="jumbotron text-center">
 
         {% if joining %}
             <h1>{% trans 'You are joining team' %}:</h1>
         {% else %}
-            <h1>{% trans 'You are in team' %}:</h1>
+            <h1>{% trans 'You are now in team' %}:</h1>
         {% endif %}
-        <h1>{{ team_name }}</h1>
+        <h1>{{ object.name }}</h1>
 
     </div>
 
-    <div class="container p-5">
-        <img src="{{ object.logo.url }}" class="rounded-circle mx-auto d-block img-fluid" alt="Flower image">
+    <div class="container pt-3">
+        <img src="{{ object.logo.url }}" class="rounded-circle mx-auto d-block img-fluid"
+             style="max-width:300px;width:100%" alt="Team Image">
     </div>
 {% endblock %}
